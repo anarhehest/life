@@ -3,7 +3,8 @@
 #include <stdio.h>
 #include "grid.h"
 
-#define DELAY 250
+#define FONT_PATH "../resources/Roboto-Medium.ttf"
+#define FONT_SIZE 20
 
 void renderText(SDL_Renderer* renderer, TTF_Font* font, const char* text, int x, int y) {
     SDL_Color color = {64, 64, 64};
@@ -16,6 +17,27 @@ void renderText(SDL_Renderer* renderer, TTF_Font* font, const char* text, int x,
 }
 
 int main(int argc, char* argv[]) {
+
+    if (argc < 4) {
+        printf("Usage: %s <delay> <width> <height>\n", argv[0]);
+        printf("\tdelay - update time (ms)\n");
+        printf("\twidth - game field width (px)\n");
+        printf("\theight - game field height (px)\n");
+        return 1;
+    }
+
+    const int DELAY = atoi(argv[1]);
+    GRID_WIDTH = atoi(argv[2]);
+    GRID_HEIGHT = atoi(argv[3]);
+
+    if (GRID_WIDTH <= 0 || GRID_HEIGHT <= 0) {
+        printf("Grid dimensions must be positive integers.\n");
+        return 1;
+    }
+
+    printf("Updating speed: %d ms\n", DELAY);
+    printf("Grid dimensions: %d x %d\n", GRID_WIDTH, GRID_HEIGHT);
+
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
         return 1;
@@ -27,7 +49,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    TTF_Font* font = TTF_OpenFont("./resources/Roboto-Medium.ttf", 24);
+    TTF_Font* font = TTF_OpenFont(FONT_PATH, FONT_SIZE);
     if (font == NULL) {
         printf("Failed to load font! TTF_Error: %s\n", TTF_GetError());
         TTF_Quit();
@@ -58,7 +80,9 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    int grid[GRID_HEIGHT][GRID_WIDTH] = {0};
+    int grid[GRID_HEIGHT][GRID_WIDTH];
+    memset(grid, 0, sizeof(int) * GRID_HEIGHT * GRID_WIDTH);
+
     int running = 1;
     int paused = 1;
     SDL_Event event;
